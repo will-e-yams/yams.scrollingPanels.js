@@ -79,7 +79,7 @@
 			.css('overflow-y', 'auto');
 
         var marginBottomTarget = $e;
-        if ($e.hasClass('panel-body'))
+        if ($e.parents('.panel-body').length > 0)
             marginBottomTarget = $e.parents('.panel');
 
         marginBottomTarget.css('marginBottom', this.options.marginBottom + 'px')
