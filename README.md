@@ -18,7 +18,7 @@ _*Note:* requires [jQuery](http://jQuery.com)_
 ```
 <script type="text/javascript">
 	$(function() {
-		$('.scrolling-panels')..scrollingPanel();
+		$('.scrolling-panels').scrollingPanel();
 	})
 </script>
 

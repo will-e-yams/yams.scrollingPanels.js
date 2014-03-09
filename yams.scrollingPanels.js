@@ -3,101 +3,110 @@
 * yams.scrollingPanel.js
 * version:	1.0
 * author:	Brad Williams <brad.lee.williams@gmail.com>
+*           thanks Bootstrap for the plugin template
 * ======================================================================== */
 
 +function ($) {
-	'use strict';
+    'use strict';
 
-	// scrollingPanel PUBLIC CLASS DEFINITION
-	// ===============================
+    // scrollingPanel PUBLIC CLASS DEFINITION
+    // ===============================
 
-	var ScrollingPanel = function (element, options) {
-		this.type =
+    var ScrollingPanel = function (element, options) {
+        this.type =
 		this.options =
 		this.$element = null
 
-		this.init('scrollingPanel', element, options)
-	}
+        this.init('scrollingPanel', element, options)
+    }
 
-	ScrollingPanel.DEFAULTS = {
-	    minHeight: 100,
-		offsetTop: 0,
-		offsetBottom: 25,
-		scrollbarPadding: 10,
+    ScrollingPanel.DEFAULTS = {
+        minHeight: 100,
+        maxHeight: 1000,
+        offsetTop: 0,
+        offsetBottom: 25,
+        scrollbarPadding: 10,
         marginBottom: 0
-	}
+    }
 
-	ScrollingPanel.prototype.init = function (type, element, options) {
-		this.type = type
-		this.$element = $(element)
-		this.options = this.getOptions(options)
+    ScrollingPanel.prototype.init = function (type, element, options) {
+        this.type = type
+        this.$element = $(element)
+        this.options = this.getOptions(options)
 
-		// initiale adjust
-		this.adjust();
-		// adjust on resize
-		this.$window = $(window)
+        // initiale adjust
+        this.adjust();
+        // adjust on resize
+        this.$window = $(window)
 			.on('resize.yams.scrollingPanel', $.proxy(this.adjust, this))
-	}
+    }
 
-	ScrollingPanel.prototype.getDefaults = function () {
-		return ScrollingPanel.DEFAULTS
-	}
+    ScrollingPanel.prototype.getDefaults = function () {
+        return ScrollingPanel.DEFAULTS
+    }
 
-	ScrollingPanel.prototype.getOptions = function (options) {
-		options = $.extend({}, this.getDefaults(), this.$element.data(), options)
-		return options
-	}
+    ScrollingPanel.prototype.getOptions = function (options) {
+        options = $.extend({}, this.getDefaults(), this.$element.data(), options)
+        return options
+    }
 
-	ScrollingPanel.prototype.adjust = function () {
-		var $e = this.$element
-		var e = this.$element[0]
-		var eOffsetTop = 0;
+    ScrollingPanel.prototype.adjust = function () {
+        var $e = this.$element
+        var e = this.$element[0]
+        var rect = null;
+        var setHeight = this.options.minHeight;
 
-		if ($e.is(':visible')) {
-			eOffsetTop = e.getBoundingClientRect().top;
-		} else {
-			eOffsetTop = $e.parents(':visible')[0].getBoundingClientRect().top;
-		}
-		var calcHeight = window.innerHeight - eOffsetTop - (this.options.offsetTop + this.options.offsetBottom);
-		$e.css('height',
-                calcHeight < this.options.minHeight ? this.options.minHeight : calcHeight)
+        if ($e.is(':visible')) {
+            rect = e.getBoundingClientRect();
+        } else {
+            rect = $e.parents(':visible')[0].getBoundingClientRect();
+        }
+
+        if (e.scrollHeight > this.options.maxHeight)
+            setHeight = this.options.maxHeight;
+        else {
+            var calcHeight = window.innerHeight - rect.top - (this.options.offsetTop + this.options.offsetBottom);
+            if (calcHeight > setHeight)
+                setHeight = calcHeight;
+        }
+        $e.css('height', setHeight)
 			.css('paddingRight', this.options.scrollbarPadding + 'px')
 			.css('overflow-x', 'none')
 			.css('overflow-y', 'auto');
 
-		var marginBottomTarget = $e;
-		if ($e.hasClass('panel-body'))
-		    marginBottomTarget = $e.parents('.panel');
-        
-		marginBottomTarget.css('marginBottom', this.options.marginBottom + 'px')
-	}
+        var marginBottomTarget = $e;
+        if ($e.hasClass('panel-body'))
+            marginBottomTarget = $e.parents('.panel');
 
-	// scrollingPanel PLUGIN DEFINITION
-	// =========================
+        marginBottomTarget.css('marginBottom', this.options.marginBottom + 'px')
+    }
 
-	var old = $.fn.scrollingPanel
+    // scrollingPanel PLUGIN DEFINITION
+    // =========================
 
-	$.fn.scrollingPanel = function (option) {
-		return this.each(function () {
-			var $this = $(this)
-			var data = $this.data('yams.scrollingPanel')
-			var options = typeof option == 'object' && option
+    var old = $.fn.scrollingPanel
 
-			if (!data) $this.data('yams.scrollingPanel', (data = new ScrollingPanel(this, options)))
-			if (typeof option == 'string') data[option]()
-		})
-	}
+    $.fn.scrollingPanel = function (option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('yams.scrollingPanel')
+            var options = typeof option == 'object' && option
 
-	$.fn.scrollingPanel.Constructor = ScrollingPanel
+            if (!data) $this.data('yams.scrollingPanel', (data = new ScrollingPanel(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    $.fn.scrollingPanel.Constructor = ScrollingPanel
 
 
-	// scrollingPanel NO CONFLICT
-	// ===================
+    // scrollingPanel NO CONFLICT
+    // ===================
 
-	$.fn.scrollingPanel.noConflict = function () {
-		$.fn.scrollingPanel = old
-		return this
-	}
+    $.fn.scrollingPanel.noConflict = function () {
+        $.fn.scrollingPanel = old
+        return this
+    }
 
-} (jQuery);
+}(jQuery);
 
