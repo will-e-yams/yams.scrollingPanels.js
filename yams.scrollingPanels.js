@@ -22,7 +22,7 @@
 
     ScrollingPanel.DEFAULTS = {
         minHeight: 100,
-        maxHeight: 1000,
+        //maxHeight: disables auto-height
         offsetTop: 0,
         offsetBottom: 25,
         scrollbarPadding: 10,
@@ -62,8 +62,12 @@
             rect = $e.parents(':visible')[0].getBoundingClientRect();
         }
 
-        if (e.scrollHeight > this.options.maxHeight)
-            setHeight = this.options.maxHeight;
+        if (this.options.maxHeight) {
+            if (e.scrollHeight > this.options.maxHeight)
+                setHeight = this.options.maxHeight;
+            else if (e.scrollHeight > this.options.minHeight)
+                setHeight = e.scrollHeight;
+        }
         else {
             var calcHeight = window.innerHeight - rect.top - (this.options.offsetTop + this.options.offsetBottom);
             if (calcHeight > setHeight)
